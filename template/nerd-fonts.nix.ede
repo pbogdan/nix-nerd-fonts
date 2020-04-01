@@ -1,0 +1,55 @@
+{ stdenv
+, fetchzip
+, symlinkJoin
+}:
+let
+  generic =
+    { name
+    , sha256
+    , url
+    , version
+    }:
+      stdenv.mkDerivation {
+        pname = "nerd-font-${name}";
+        inherit version;
+
+        src = fetchzip {
+          inherit sha256 url;
+          stripRoot = false;
+        };
+
+        dontConfigure = true;
+
+        dontBuild = true;
+
+        installPhase = ''
+          runHook preInstall
+
+          find \( -iname \*.ttf -o -iname \*.otf \) \
+            -exec install "$(basename "{}")" \
+            -v -m644 -D "$out/share/fonts/truetype/{}" ';'
+
+          runHook postInstall
+        '';
+
+      };
+in
+rec {
+  {% for font in fonts %}
+  nerd-font-{{ font.value.name }} = generic {
+    name = "{{ font.value.name }}";
+    url = "{{ font.value.url }}";
+    sha256 = "{{ font.value.sha256 }}";
+    version = "{{ font.value.version }}";
+  };
+  {% endfor %}
+
+  nerd-fonts = symlinkJoin {
+    name = "nerd-fonts";
+    paths = [
+    {% for font in fonts %}
+      nerd-font-{{ font.value.name }}
+    {% endfor %}
+    ];
+  };
+}
