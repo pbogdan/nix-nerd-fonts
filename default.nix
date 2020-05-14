@@ -11,7 +11,6 @@ let
             ede = overrideCabal hsuper.ede (drv: {
               src = sources."ede-trifecta-2.1";
             });
-            text-format = markUnbroken (doJailbreak hsuper.text-format);
 
             shell-cmd = import sources.shell-cmd {
               inherit sources compiler;
