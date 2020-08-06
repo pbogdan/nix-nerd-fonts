@@ -1,43 +1,39 @@
-{ sources ? (import ./nix/sources.nix)
-, compiler ? "ghc883"
+let
+  sources = import ./nix/sources.nix;
+in
+{ pkgs ? import sources.unstable { }
 , profiling ? false
 }:
 let
-  overlay = self: super: {
-    haskell = super.haskell // {
-      packages = super.haskell.packages // {
-        "${compiler}" = super.haskell.packages.${compiler}.override {
-          overrides = hself: hsuper: with self.haskell.lib; {
-            ede = overrideCabal hsuper.ede (drv: {
-              src = sources."ede-trifecta-2.1";
-            });
-
-            shell-cmd = import sources.shell-cmd {
-              inherit sources compiler;
-            };
+  hspkgs = pkgs.haskellPackages.override {
+    overrides = hself: hsuper: with pkgs.haskell.lib; {
+      ede = overrideCabal hsuper.ede (
+        drv: {
+          src = pkgs.fetchFromGitHub {
+            owner = "brendanhay";
+            repo = "ede";
+            rev = "5e0373b8a8c83ff2078a938795e30ec8038d228c";
+            sha256 = "1lb0q289p6lrc65adlacdx8xy8hrvcywbf6np7rilqdvvnyvlbgs";
           };
-        };
+        }
+      );
+
+      shell-cmd = import sources.shell-cmd {
+        inherit pkgs;
       };
     };
   };
 
-  pkgs = (
-    import sources.unstable {
-      overlays = [
-        overlay
-      ];
-    }
-  );
-
-  inherit (pkgs.haskell.packages.${compiler})
+  inherit (hspkgs)
     callCabal2nix
-    shellFor
     ;
+
   inherit (pkgs.haskell.lib)
     enableLibraryProfiling
     enableExecutableProfiling
     justStaticExecutables
     ;
+
   inherit (pkgs)
     lib
     nix-gitignore
@@ -49,8 +45,7 @@ let
   ];
   nix-nerd-fonts = callCabal2nix
     "nix-nerd-fonts"
-    (nix-gitignore.gitignoreSource extra-source-excludes ./.)
-    {};
+    (nix-gitignore.gitignoreSource extra-source-excludes ./.) { };
 in
 if profiling then
   enableExecutableProfiling (enableLibraryProfiling nix-nerd-fonts)
