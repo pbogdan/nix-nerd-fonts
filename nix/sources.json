@@ -17,10 +17,10 @@
         "homepage": null,
         "owner": "pbogdan",
         "repo": "shell-cmd",
-        "rev": "2b99b304df9101f0667515d3781f33e9fbb22f2e",
-        "sha256": "0dagrnwj51j90sl3wigap51s4zf2ljiis003mq6bwvsiw0yn6sf5",
+        "rev": "b4ea70fdecec2bbf96d1ae5625405085072864d8",
+        "sha256": "07g4n72yknarvvgz5srf3q81ssxy7gfy7wc23nmd2n84wdz4yq1b",
         "type": "tarball",
-        "url": "https://github.com/pbogdan/shell-cmd/archive/2b99b304df9101f0667515d3781f33e9fbb22f2e.tar.gz",
+        "url": "https://github.com/pbogdan/shell-cmd/archive/b4ea70fdecec2bbf96d1ae5625405085072864d8.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "unstable": {
