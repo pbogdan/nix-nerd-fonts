@@ -15,6 +15,8 @@ import           Data.Aeson                     ( ToJSON
                                                 , toJSON
                                                 )
 import           Data.Aeson.Encode.Pretty       ( encodePretty )
+import qualified Data.ByteString.Char8         as CharBytes
+import qualified Data.ByteString.Lazy          as LazyBytes
 import qualified Data.HashMap.Strict           as HashMap
 import qualified Data.Text                     as Text
 import qualified Data.Text.IO                  as Text
@@ -42,7 +44,7 @@ lookupToken :: (MonadIO m, MonadError Text m) => m ByteString
 lookupToken = do
   mToken <- liftIO . lookupEnv $ "GITHUB_TOKEN"
   case mToken of
-    Just token -> pure . toS $ token
+    Just token -> pure . CharBytes.pack $ token
     Nothing    -> throwError "no GitHub token found in the environment."
 
 request
@@ -130,7 +132,7 @@ run = do
       . createDirectoryIfMissing True
       . FilePath.takeDirectory
       $ cacheFileName
-    liftIO . Text.writeFile cacheFileName . toS . encodePretty $ updatedCache
+    liftIO . Text.writeFile cacheFileName . decodeUtf8 . LazyBytes.toStrict . encodePretty $ updatedCache
   case ret of
     Left (err :: Text) -> do
       putText ("An error occurred: " <> err)

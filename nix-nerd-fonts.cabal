@@ -27,7 +27,7 @@ library
         github -any,
         monad-logger -any,
         optparse-applicative -any,
-        protolude -any,
+        protolude >= 0.3.0,
         unordered-containers -any,
         shell-cmd -any,
         text -any,
